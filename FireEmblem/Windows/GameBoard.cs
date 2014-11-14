@@ -45,6 +45,9 @@ namespace FireEmblem
                 }
             }
             tiles[new Vector2(5)].Piece = new GamePiece(Content.Load<Texture2D>("Circle"), tiles[new Vector2(5)].Rectangle);
+            tiles[new Vector2(3, 5)].Piece = new GamePiece(Content.Load<Texture2D>("Circle"), tiles[new Vector2(3, 5)].Rectangle);
+            tiles[new Vector2(4, 5)].Piece = new GamePiece(Content.Load<Texture2D>("Circle"), tiles[new Vector2(4, 5)].Rectangle);
+            tiles[new Vector2(2, 5)].Piece = new GamePiece(Content.Load<Texture2D>("Circle"), tiles[new Vector2(2, 5)].Rectangle);
         }
 
         public void Update(GameTime gameTime)
@@ -73,6 +76,10 @@ namespace FireEmblem
                     selectedTile.Piece = null;
                 }
                 selectedTile = tiles[selectedCoords];
+            }
+            if(InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
+            {
+                selectedTile = null;
             }
             for (int x = 0; x < boardWidth; x++)
             {
@@ -113,16 +120,44 @@ namespace FireEmblem
 
         public void ShowMovement()
         {
-            for (int x = -selectedTile.Piece.stats.MovementSpeed; x <= selectedTile.Piece.stats.MovementSpeed; x++)
+            List<Vector2> moveableTiles = new List<Vector2>();
+            moveableTiles.Add(new Vector2(selectedTile.Position.X  / selectedTile.Width, selectedTile.Position.Y / selectedTile.Height));
+            int currentMovement = 0;
+            int currentIndex = 0;
+            while (currentMovement <  selectedTile.Piece.stats.MovementSpeed)
             {
-                for (int y = -selectedTile.Piece.stats.MovementSpeed; y <= selectedTile.Piece.stats.MovementSpeed; y++)
+                List<Vector2> newTiles = new List<Vector2>();
+                for (int i = currentIndex; i < moveableTiles.Count; i++)
                 {
-                    if (Math.Abs(x) + Math.Abs(y) <= 3)
+                    Vector2 aboveTile = Vector2.Clamp(new Vector2(moveableTiles[i].X, moveableTiles[i].Y - 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
+                    Vector2 belowTile = Vector2.Clamp(new Vector2(moveableTiles[i].X, moveableTiles[i].Y + 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
+                    Vector2 rightTile = Vector2.Clamp(new Vector2(moveableTiles[i].X + 1, moveableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
+                    Vector2 leftTile = Vector2.Clamp(new Vector2(moveableTiles[i].X - 1, moveableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
+                    if (!moveableTiles.Contains(aboveTile) && !newTiles.Contains(aboveTile) && tiles[aboveTile].Piece == null)
                     {
-                        Vector2 changedSelection = Vector2.Clamp(new Vector2(x, y) + new Vector2(selectedTile.X / selectedTile.Width, selectedTile.Y / selectedTile.Height), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                        tiles[changedSelection].Color = Color.Purple;
+                        newTiles.Add(aboveTile);
+                    }
+                    if (!moveableTiles.Contains(belowTile) && !newTiles.Contains(belowTile) && tiles[belowTile].Piece == null)
+                    {
+                        newTiles.Add(belowTile);
+                    }
+                    if (!moveableTiles.Contains(rightTile) && !newTiles.Contains(rightTile) && tiles[rightTile].Piece == null)
+                    {
+                        newTiles.Add(rightTile);
+                    }
+                    if (!moveableTiles.Contains(leftTile) && !newTiles.Contains(leftTile) && tiles[leftTile].Piece == null)
+                    {
+                        newTiles.Add(leftTile);
                     }
                 }
+                currentIndex = moveableTiles.Count - 1;
+                currentMovement++;
+                moveableTiles.AddRange(newTiles);
+            }
+
+            for(int i = 0; i < moveableTiles.Count; i++)
+            {
+                tiles[moveableTiles[i]].Color = Color.Purple;
             }
         }
     }

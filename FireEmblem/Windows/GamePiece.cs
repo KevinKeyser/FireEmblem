@@ -13,13 +13,13 @@ namespace FireEmblem
         public GamePiece(Texture2D texture, Vector2 position)
             : base(texture, position) 
         {
-            stats = new CharacterStatistics(3, 4, 5, 3, 2, 5);
+            stats = new CharacterStatistics(4, 4, 5, 3, 2, 5);
         }
 
         public GamePiece(Texture2D texture, Rectangle rectangle)
             : base(texture, rectangle)
         {
-            stats = new CharacterStatistics(3, 4, 5, 3, 2, 5);
+            stats = new CharacterStatistics(4, 4, 5, 3, 2, 5);
         }
 
         public override string ToString()
