@@ -23,6 +23,7 @@ namespace FireEmblem
         GraphicsDevice graphicsDevice;
         SpriteFont font;
         private bool isAttack;
+        private bool isItem;
         private int width = 200;
         public bool IsAttack
         {
@@ -64,11 +65,52 @@ namespace FireEmblem
             }
         }
 
+        public bool IsItem
+        {
+            set
+            {
+                if (value != isItem)
+                {
+                    selectedIndex = 0;
+                    if (value)
+                    {
+                        foreach (Label label in labels)
+                        {
+                            label.Bounds = new Rectangle(area.X, (int)label.Position.Y + labels[0].Bounds.Height, label.Bounds.Width, label.Bounds.Height);
+                        }
+                        labels.Add(new Label("Items", graphicsDevice, font, "Items", new Vector2(area.X, area.Y + labels[0].Bounds.Height)));
+                        for (int i = labels.Count - 1; i > 1; i--)
+                        {
+                            Label temp;
+                            temp = labels[i];
+                            labels[i] = labels[i - 1];
+                            labels[i - 1] = temp;
+                        }
+                    }
+                    else
+                    {
+                        int index = 0;
+                        for (int i = 1; i < labels.Count; i++)
+                        {
+                            labels[i].Bounds = new Rectangle(area.X, (int)labels[i].Position.Y - labels[0].Bounds.Height, labels[i].Bounds.Width, labels[i].Bounds.Height);
+                            if (labels[i].Name == "Items")
+                            {
+                                index = i;
+                            }
+                        }
+                        labels.RemoveAt(index);
+                    }
+                    isItem = value;
+                }
+            }
+        }
+
         public BattleMenu(GraphicsDevice graphicsDevice, ContentManager Content)
         {
             Piece = null;
             IsVisible = false;
             isAttack = true;
+            isItem = true;
             labels = new List<Label>();
             color = Color.Brown;
             texture = new Texture2D(graphicsDevice, 1, 1);

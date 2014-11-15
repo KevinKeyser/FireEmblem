@@ -9,7 +9,9 @@ namespace FireEmblem
     {
         Picking,
         Moving,
-        BattleChoice
+        BattleChoice,
+        Attack,
+        Items
     }
     public enum Terrian
     {

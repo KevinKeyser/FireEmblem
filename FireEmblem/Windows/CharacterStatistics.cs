@@ -7,6 +7,7 @@ namespace FireEmblem
 {
     public class CharacterStatistics
     {
+        public int HealthPoints;
         public int Strength;
         public int Magic;
         public int Skill;
@@ -15,8 +16,9 @@ namespace FireEmblem
         public int Defense;
         public int Resistance;
         
-        public CharacterStatistics( int strength, int magic, int skill, int speed, int luck, int defense, int resistance)
+        public CharacterStatistics(int healthPoints, int strength, int magic, int skill, int speed, int luck, int defense, int resistance)
         {
+            HealthPoints = healthPoints;
             Strength = strength;
             Magic = magic;
             Skill = skill;
@@ -28,7 +30,17 @@ namespace FireEmblem
 
         public override string ToString()
         {
-            return string.Format("Strength: {0}\nMagic: {1}\nSkill: {2}\nSpeed: {3}\nLuck: {4}\nDefense: {5}\nResistance: {6}", Strength, Magic, Skill, Speed, Luck, Defense, Resistance);
+            return string.Format("HP: {0}\nStrength: {1}\nMagic: {2}\nSkill: {3}\nSpeed: {4}\nLuck: {5}\nDefense: {6}\nResistance: {7}", HealthPoints, Strength, Magic, Skill, Speed, Luck, Defense, Resistance);
+        }
+
+        public static CharacterStatistics operator +(CharacterStatistics stats, CharacterStatistics other)
+        {
+            return new CharacterStatistics(stats.HealthPoints + other.HealthPoints, stats.Strength + other.Strength, stats.Magic + other.Magic, stats.Skill + other.Skill, stats.Speed + other.Speed, stats.Luck + other.Luck, stats.Defense + other.Defense, stats.Resistance + other.Resistance);
+        }
+
+        public static CharacterStatistics operator -(CharacterStatistics stats, CharacterStatistics other)
+        {
+            return new CharacterStatistics(stats.HealthPoints - other.HealthPoints, stats.Strength - other.Strength, stats.Magic - other.Magic, stats.Skill - other.Skill, stats.Speed - other.Speed, stats.Luck - other.Luck, stats.Defense - other.Defense, stats.Resistance - other.Resistance);
         }
     }
 }

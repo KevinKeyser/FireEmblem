@@ -17,6 +17,7 @@ namespace FireEmblem
         int boardHeight;
         int boardWidth;
         int tileSize;
+        Vector2 MoveBackLocation;
         List<Vector2> lastMoveTiles;
         public Tile selectedTile;
         private Vector2 selectedCoords;
@@ -52,10 +53,10 @@ namespace FireEmblem
                     tiles.Add(new Vector2(x, y), new Tile(Content.Load<Texture2D>("Tile"), new Vector2(tileSize * x, tileSize * y), tileSize));
                 }
             }
-            tiles[new Vector2(5)].Piece = new GamePiece(Content.Load<Texture2D>("Circle"), tiles[new Vector2(5)].Rectangle);
-            tiles[new Vector2(3, 5)].Piece = new GamePiece(Content.Load<Texture2D>("Circle"), tiles[new Vector2(3, 5)].Rectangle);
-            tiles[new Vector2(4, 5)].Piece = new GamePiece(Content.Load<Texture2D>("Circle"), tiles[new Vector2(4, 5)].Rectangle);
-            tiles[new Vector2(2, 5)].Piece = new GamePiece(Content.Load<Texture2D>("Circle"), tiles[new Vector2(2, 5)].Rectangle);
+            tiles[new Vector2(5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(5)].Rectangle, new CharacterStatistics(10, 10, 10, 10, 4, 4, 4, 4), new CharacterClass("Warror", new WeaponType[]{}, new CharacterStatistics(0,0,0,0,0,0,0,0)));
+            tiles[new Vector2(3, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(3, 5)].Rectangle, new CharacterStatistics(10, 10, 10, 10, 3, 3, 3, 3), new CharacterClass("Warror", new WeaponType[] { }, new CharacterStatistics(0, 0, 0, 0, 0, 0, 0, 0)));
+            tiles[new Vector2(4, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(4, 5)].Rectangle, new CharacterStatistics(10, 10, 10, 10, 3, 3, 3, 3), new CharacterClass("Warror", new WeaponType[] { }, new CharacterStatistics(0, 0, 0, 0, 0, 0, 0, 0)));
+            tiles[new Vector2(2, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(2, 5)].Rectangle, new CharacterStatistics(10, 10, 10, 10, 3, 3, 3, 3), new CharacterClass("Warror", new WeaponType[] { }, new CharacterStatistics(0, 0, 0, 0, 0, 0, 0, 0)));
             battleMenu = new BattleMenu(Content.Load<Texture2D>("Tile").GraphicsDevice, Content);
             battleMenu.IsVisible = true;
             camera = new Camera2D(Content.Load<Texture2D>("Tile").GraphicsDevice);
@@ -69,16 +70,18 @@ namespace FireEmblem
             string name = sender.ToString();
             if (name == "Attack")
             {
-
+                turnorder = TurnOrder.Attack;
             }
             else if (name == "Items")
             {
-
+                turnorder = TurnOrder.Items;
             }
             else if (name == "Wait")
             {
                 turnorder = TurnOrder.Picking;
-
+                Character character = ((Character)tiles[MoveBackLocation].Piece);
+                character.HasMoved = true;
+                tiles[MoveBackLocation].Piece = character;
             }
         }
 
@@ -92,8 +95,7 @@ namespace FireEmblem
                     tiles[new Vector2(x, y)].Color = Color.White;
                 }
             }
-            selectedTile.Color = Color.Blue;
-            if (turnorder != TurnOrder.BattleChoice)
+            if (turnorder != TurnOrder.BattleChoice && turnorder != TurnOrder.Items)
             {
                 if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Right))
                 {
@@ -111,23 +113,20 @@ namespace FireEmblem
                 {
                     selectedCoords.Y = MathHelper.Clamp(selectedCoords.Y + 1, 0, boardHeight - 1);
                 }
-                if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
-                {
-                    turnorder = TurnOrder.Picking;
-                }
             }
             switch (turnorder)
             {
                 case TurnOrder.Picking:
+                    selectedTile.Color = Color.Blue;
                     selectedTile = tiles[selectedCoords];
                     if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter))
                     {
-                        if (selectedTile.Piece != null)
+                        if (selectedTile.Piece != null && !((Character)selectedTile.Piece).HasMoved)
                         {
                             turnorder = TurnOrder.Moving;
                         }
                     }
-                    if (selectedTile.Piece != null)
+                    if (selectedTile.Piece != null && !((Character)selectedTile.Piece).HasMoved)
                     {
                         ShowMovement();
                     }
@@ -153,21 +152,29 @@ namespace FireEmblem
                                 tiles[selectedCoords].Piece = selectedTile.Piece;
                                 selectedTile.Piece = null;
                             }
-                            ShowAttackRange();
-                            if(attackableTiles.Count == 0)
+                            ShowAttackRange(tiles[selectedCoords]);
+                            if (attackableTiles.Count == 0)
                             {
                                 battleMenu.IsAttack = false;
+                                battleMenu.IsItem = true;
                             }
                             else
                             {
                                 battleMenu.IsAttack = true;
+                                battleMenu.IsItem = true;
                             }
+                            MoveBackLocation = new Vector2(tiles[selectedCoords].Position.X / tileSize, tiles[selectedCoords].Position.Y / tileSize);
                         }
+                    }
+
+                    if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
+                    {
+                        turnorder = TurnOrder.Picking;
                     }
                     break;
                 case TurnOrder.BattleChoice:
                     battleMenu.Update(gameTime);
-                    ShowAttackRange();
+                    ShowAttackRange(tiles[MoveBackLocation]);
                     if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
                     {
                         if (tiles[selectedCoords] != selectedTile)
@@ -177,6 +184,37 @@ namespace FireEmblem
                         }
                         turnorder = TurnOrder.Moving;
                         battleMenu.Piece = null;
+                    }
+                    break;
+                case TurnOrder.Attack:
+                    ShowAttackRange(tiles[MoveBackLocation]);
+                    if (tiles[selectedCoords].Color == Color.Green)
+                    {
+                        tiles[selectedCoords].Color = Color.Lerp(Color.Red, Color.Green, .5f);
+                    }
+                    else
+                    {
+                        tiles[selectedCoords].Color = Color.Green;
+                    }
+                    if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter))
+                    {
+                        if (tiles[selectedCoords].Color == Color.Lerp(Color.Red, Color.Green, .5f))
+                        {
+                            turnorder = TurnOrder.BattleChoice;
+                            battleMenu.IsAttack = false;
+                            battleMenu.IsItem = true;
+                        }
+                    }
+                    if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
+                    {
+                        selectedCoords = MoveBackLocation;
+                        turnorder = TurnOrder.BattleChoice;
+                    }
+                    break;
+                case TurnOrder.Items:
+                    if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
+                    {
+                        turnorder = TurnOrder.BattleChoice;
                     }
                     break;
             }
@@ -210,7 +248,7 @@ namespace FireEmblem
             moveableTiles.Add(new Vector2(selectedTile.Position.X / selectedTile.Width, selectedTile.Position.Y / selectedTile.Height));
             int currentMovement = 0;
             int currentIndex = 0;
-            while (currentMovement < selectedTile.Piece.stats.Speed)
+            while (currentMovement < ((Character)selectedTile.Piece).TotalStats.Speed)
             {
                 lastMoveTiles = new List<Vector2>();
                 for (int i = currentIndex; i < moveableTiles.Count; i++)
@@ -321,58 +359,61 @@ namespace FireEmblem
             }
         }
 
-        public void ShowAttackRange()
+        public void ShowAttackRange(Tile tile)
         {
-            attackableTiles = new List<Vector2>();
-            attackableTiles.Add(new Vector2(tiles[selectedCoords].Position.X / tiles[selectedCoords].Width, tiles[selectedCoords].Position.Y / tiles[selectedCoords].Height));
-            int currentAttackRange = 1;
-            int currentIndex = 0;
-            while (currentAttackRange <= 2)// tiles[selectedCoords].Piece.stats.Speed)
+            if (tile.Piece != null)
             {
-                List<Vector2> lastAttackTiles = new List<Vector2>();
-                for (int i = currentIndex; i < attackableTiles.Count; i++)
+                attackableTiles = new List<Vector2>();
+                attackableTiles.Add(new Vector2(tile.Position.X / tile.Width, tile.Position.Y / tile.Height));
+                int currentAttackRange = 1;
+                int currentIndex = 0;
+                while (currentAttackRange <= 2)// tile.Piece.stats.Speed)
                 {
-                    Vector2 aboveTile = Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y - 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                    Vector2 belowTile = Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y + 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                    Vector2 rightTile = Vector2.Clamp(new Vector2(attackableTiles[i].X + 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                    Vector2 leftTile = Vector2.Clamp(new Vector2(attackableTiles[i].X - 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                    if (!attackableTiles.Contains(aboveTile) && !lastAttackTiles.Contains(aboveTile))
+                    List<Vector2> lastAttackTiles = new List<Vector2>();
+                    for (int i = currentIndex; i < attackableTiles.Count; i++)
                     {
-                        if (tiles[aboveTile].Piece != null)
+                        Vector2 aboveTile = Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y - 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
+                        Vector2 belowTile = Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y + 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
+                        Vector2 rightTile = Vector2.Clamp(new Vector2(attackableTiles[i].X + 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
+                        Vector2 leftTile = Vector2.Clamp(new Vector2(attackableTiles[i].X - 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
+                        if (!attackableTiles.Contains(aboveTile) && !lastAttackTiles.Contains(aboveTile))
                         {
-                            lastAttackTiles.Add(aboveTile);
+                            if (tiles[aboveTile].Piece != null)
+                            {
+                                lastAttackTiles.Add(aboveTile);
+                            }
+                        }
+                        if (!attackableTiles.Contains(belowTile) && !lastAttackTiles.Contains(belowTile))
+                        {
+                            if (tiles[belowTile].Piece != null)
+                            {
+                                lastAttackTiles.Add(belowTile);
+                            }
+                        }
+                        if (!attackableTiles.Contains(rightTile) && !lastAttackTiles.Contains(rightTile))
+                        {
+                            if (tiles[rightTile].Piece != null)
+                            {
+                                lastAttackTiles.Add(rightTile);
+                            }
+                        }
+                        if (!attackableTiles.Contains(leftTile) && !lastAttackTiles.Contains(leftTile))
+                        {
+                            if (tiles[leftTile].Piece != null)
+                            {
+                                lastAttackTiles.Add(leftTile);
+                            }
                         }
                     }
-                    if (!attackableTiles.Contains(belowTile) && !lastAttackTiles.Contains(belowTile))
-                    {
-                        if (tiles[belowTile].Piece != null)
-                        {
-                            lastAttackTiles.Add(belowTile);
-                        }
-                    }
-                    if (!attackableTiles.Contains(rightTile) && !lastAttackTiles.Contains(rightTile))
-                    {
-                        if (tiles[rightTile].Piece != null)
-                        {
-                            lastAttackTiles.Add(rightTile);
-                        }
-                    }
-                    if (!attackableTiles.Contains(leftTile) && !lastAttackTiles.Contains(leftTile))
-                    {
-                        if (tiles[leftTile].Piece != null)
-                        {
-                            lastAttackTiles.Add(leftTile);
-                        }
-                    }
+                    currentIndex = attackableTiles.Count - 1;
+                    currentAttackRange++;
+                    attackableTiles.AddRange(lastAttackTiles);
                 }
-                currentIndex = attackableTiles.Count - 1;
-                currentAttackRange++;
-                attackableTiles.AddRange(lastAttackTiles);
-            }
-            attackableTiles.RemoveAt(0);
-            for (int i = 0; i < attackableTiles.Count; i++)
-            {
-                tiles[attackableTiles[i]].Color = Color.Green;
+                attackableTiles.RemoveAt(0);
+                for (int i = 0; i < attackableTiles.Count; i++)
+                {
+                    tiles[attackableTiles[i]].Color = Color.Green;
+                }
             }
         }
     }

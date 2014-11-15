@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BattleMenu.cs" />
+    <Compile Include="Character.cs" />
     <Compile Include="CharacterClass.cs" />
     <Compile Include="CharacterStatistics.cs" />
     <Compile Include="Enums.cs" />
