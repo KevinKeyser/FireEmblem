@@ -5,6 +5,12 @@ using System.Text;
 
 namespace FireEmblem
 {
+    public enum TurnOrder
+    {
+        Picking,
+        Moving,
+        BattleChoice
+    }
     public enum Terrian
     {
         Plain,
@@ -12,5 +18,15 @@ namespace FireEmblem
         Water,
         Forest,
         Gravel
+    }
+    public enum WeaponType
+    {
+        Sword,
+        Lance,
+        Axe,
+        Bow,
+        Tome,
+        Staff,
+        Stone
     }
 }

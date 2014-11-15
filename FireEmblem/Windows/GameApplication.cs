@@ -42,9 +42,6 @@ namespace FireEmblem
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             InputManager.Update();
             gameBoard.Update(gameTime);
             base.Update(gameTime);
@@ -59,7 +56,7 @@ namespace FireEmblem
             gameBoard.Draw(spriteBatch);
             if (gameBoard.selectedTile != null)
             {
-                spriteBatch.DrawString(font, gameBoard.selectedTile.ToString(), new Vector2(600, 0), Color.Black);
+                spriteBatch.DrawString(font, gameBoard.turnorder.ToString() + "\n" + gameBoard.selectedTile.ToString(), new Vector2(600, 0), Color.Black);
             }
             spriteBatch.End();
 

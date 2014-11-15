@@ -7,25 +7,28 @@ namespace FireEmblem
 {
     public class CharacterStatistics
     {
-        public int MovementSpeed;
-        public int AttackDamage;
-        public int MagicDamage;
-        public int AttackDefense;
-        public int MagicDefense;
-        public int Evasion;
+        public int Strength;
+        public int Magic;
+        public int Skill;
+        public int Speed;
+        public int Luck;
+        public int Defense;
+        public int Resistance;
         
-        public CharacterStatistics(int movementSpeed, int attackDamage, int magicDamage, int attackDefense, int magicDefense, int evasion)
+        public CharacterStatistics( int strength, int magic, int skill, int speed, int luck, int defense, int resistance)
         {
-            MovementSpeed = movementSpeed;
-            AttackDamage = attackDamage;
-            MagicDamage = magicDamage;
-            AttackDefense = attackDefense;
-            Evasion = evasion;
+            Strength = strength;
+            Magic = magic;
+            Skill = skill;
+            Speed = speed;
+            Luck = luck;
+            Defense = defense;
+            Resistance = resistance;
         }
 
         public override string ToString()
         {
-            return string.Format("MovementSpeed: {0}\nAttackDamage: {1}\nMagicDamage: {2}\nAttackDefense: {3}\nMagicDefense: {4}\nEvasion: {5}", MovementSpeed, AttackDamage, MagicDamage, AttackDefense, MagicDefense, Evasion);
+            return string.Format("Strength: {0}\nMagic: {1}\nSkill: {2}\nSpeed: {3}\nLuck: {4}\nDefense: {5}\nResistance: {6}", Strength, Magic, Skill, Speed, Luck, Defense, Resistance);
         }
     }
 }
