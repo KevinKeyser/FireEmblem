@@ -17,5 +17,10 @@ namespace FireEmblem
             UsableWeapons = usableweapons;
             Stats = stats;
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

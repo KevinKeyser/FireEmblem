@@ -15,8 +15,15 @@ namespace FireEmblem
         public int Luck;
         public int Defense;
         public int Resistance;
+        public int Movement;
         
-        public CharacterStatistics(int healthPoints, int strength, int magic, int skill, int speed, int luck, int defense, int resistance)
+        public CharacterStatistics()
+            : this(0,0,0,0,0,0,0,0,0) {}
+
+        public CharacterStatistics(int healthPoints, int strength, int magic, int skill, int speed, int defense, int resistance, int movement)
+            : this(healthPoints, strength, magic, skill, speed, 0, defense, resistance, movement) {}
+
+        public CharacterStatistics(int healthPoints, int strength, int magic, int skill, int speed, int luck, int defense, int resistance, int movement)
         {
             HealthPoints = healthPoints;
             Strength = strength;
@@ -26,6 +33,7 @@ namespace FireEmblem
             Luck = luck;
             Defense = defense;
             Resistance = resistance;
+            Movement = movement;
         }
 
         public override string ToString()
@@ -35,12 +43,12 @@ namespace FireEmblem
 
         public static CharacterStatistics operator +(CharacterStatistics stats, CharacterStatistics other)
         {
-            return new CharacterStatistics(stats.HealthPoints + other.HealthPoints, stats.Strength + other.Strength, stats.Magic + other.Magic, stats.Skill + other.Skill, stats.Speed + other.Speed, stats.Luck + other.Luck, stats.Defense + other.Defense, stats.Resistance + other.Resistance);
+            return new CharacterStatistics(stats.HealthPoints + other.HealthPoints, stats.Strength + other.Strength, stats.Magic + other.Magic, stats.Skill + other.Skill, stats.Speed + other.Speed, stats.Luck + other.Luck, stats.Defense + other.Defense, stats.Resistance + other.Resistance, stats.Movement + other.Movement);
         }
 
         public static CharacterStatistics operator -(CharacterStatistics stats, CharacterStatistics other)
         {
-            return new CharacterStatistics(stats.HealthPoints - other.HealthPoints, stats.Strength - other.Strength, stats.Magic - other.Magic, stats.Skill - other.Skill, stats.Speed - other.Speed, stats.Luck - other.Luck, stats.Defense - other.Defense, stats.Resistance - other.Resistance);
+            return new CharacterStatistics(stats.HealthPoints - other.HealthPoints, stats.Strength - other.Strength, stats.Magic - other.Magic, stats.Skill - other.Skill, stats.Speed - other.Speed, stats.Luck - other.Luck, stats.Defense - other.Defense, stats.Resistance - other.Resistance, stats.Movement - other.Movement);
         }
     }
 }
