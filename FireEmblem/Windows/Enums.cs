@@ -31,9 +31,66 @@ namespace FireEmblem
         Staff,
         Stone
     }
+
+    public enum ItemType
+    {
+        Weapon,
+        Usable,
+        Ect
+    }
+
+    public enum UnitType
+    {
+        Beasts,
+        Armored,
+        Flying,
+        Monsters,
+        Dragons,
+        FellDragon
+    }
+    public enum WeaponSpecial
+    {
+        None,
+        ExtraStats,
+        Recover,
+        Skill,
+        Magic,
+    }
     public enum WeaponName
     {
-        name
+        BronzeSword,
+        IronSword,
+        SteelSword,
+        SilverSword,
+        BraveSword,
+        Armourslayer,
+        Wyrmslayer,
+        KillingEdge,
+        LevinSword,
+        Rapier,
+        NobleRapier,
+        Missiletainn,
+        Sol,
+        Amatsu,
+        Falchion,
+        ExaltedFalchion,
+        ParallelFalchion,
+        Mercurius,
+        Tyfing,
+        Balmung,
+        Mystletainn,
+        DolKatti,
+        Ragnell,
+        TreeBranch,
+        GlassSword,
+        SoothingSword,
+        SuperiorEdge,
+        LeifsBlade,
+        RoysBlade,
+        EliwoodsBlade,
+        EirikasBlade,
+        SeliphsBlade,
+        AlmsBlade
     }
 
     public enum ClassName

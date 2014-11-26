@@ -12,6 +12,7 @@ namespace FireEmblem
 
     public class GameBoard
     {
+        Texture2D pixel;
         public TurnOrder turnorder;
         Dictionary<Vector2, Tile> tiles;
         int boardHeight;
@@ -35,10 +36,14 @@ namespace FireEmblem
             }
         }
         BattleMenu battleMenu;
+        ItemMenu itemMenu;
         Camera2D camera;
 
         public GameBoard(ContentManager Content, int tileSize, int boardWidth, int boardHeight)
         {
+            pixel = new Texture2D(Content.Load<Texture2D>("Tile").GraphicsDevice, 1, 1);
+            pixel.SetData<Color>(new Color[] {Color.White});
+
             turnorder = TurnOrder.Picking;
             this.tileSize = tileSize;
             this.boardHeight = boardHeight;
@@ -53,16 +58,34 @@ namespace FireEmblem
                     tiles.Add(new Vector2(x, y), new Tile(Content.Load<Texture2D>("Tile"), new Vector2(tileSize * x, tileSize * y), tileSize));
                 }
             }
-            tiles[new Vector2(5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(5)].Rectangle, new CharacterStatistics(10, 12, 10, 10, 4, 4, 4, 4, 0), Info.Classes[ClassName.Warrior]) { Weapon = Info.Weapons[WeaponName.name] };
-            tiles[new Vector2(3, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(3, 5)].Rectangle, new CharacterStatistics(12, 10, 10, 10, 3, 3, 3, 3, 0), Info.Classes[ClassName.Warrior]) { Weapon = Info.Weapons[WeaponName.name] };
-            tiles[new Vector2(4, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(4, 5)].Rectangle, new CharacterStatistics(10, 10, 14, 10, 3, 3, 3, 3, 0), Info.Classes[ClassName.Warrior]) { Weapon = Info.Weapons[WeaponName.name] };
-            tiles[new Vector2(2, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(2, 5)].Rectangle, new CharacterStatistics(11, 10, 10, 10, 3, 3, 3, 3, 0), Info.Classes[ClassName.Warrior]) { Weapon = Info.Weapons[WeaponName.name] };
-            battleMenu = new BattleMenu(Content.Load<Texture2D>("Tile").GraphicsDevice, Content);
-            battleMenu.IsVisible = true;
+            tiles[new Vector2(5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(5)].Rectangle, new CharacterStatistics(), Info.Classes[ClassName.Mercenary]) { Weapon = Info.Weapons[WeaponName.IronSword] };
+            tiles[new Vector2(5)].Piece.ToCharacter().Items = new Item[] { new HealthItem("Potion", 0, 0, 10, 3, 1000), Info.Weapons[WeaponName.BronzeSword], Info.Weapons[WeaponName.IronSword] };
+            tiles[new Vector2(3, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(3, 5)].Rectangle, new CharacterStatistics(), Info.Classes[ClassName.Myrmidon]) { Weapon = Info.Weapons[WeaponName.IronSword] };
+            tiles[new Vector2(4, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(4, 5)].Rectangle, new CharacterStatistics(), Info.Classes[ClassName.Lord]) { Weapon = Info.Weapons[WeaponName.IronSword] };
+            tiles[new Vector2(2, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(2, 5)].Rectangle, new CharacterStatistics(), Info.Classes[ClassName.Tactician]) { Weapon = Info.Weapons[WeaponName.IronSword] };
+            battleMenu = new BattleMenu(new Vector2(0, 0), new Vector2(200, 400), Content.Load<SpriteFont>("Font"), pixel);
+            itemMenu = new ItemMenu(Vector2.Zero, new Vector2(200, 400), Content.Load<SpriteFont>("Font"), pixel);
             camera = new Camera2D(Content.Load<Texture2D>("Tile").GraphicsDevice);
             camera.Position = new Vector2(SelectedCoords.X * tileSize + tileSize / 2, selectedCoords.Y * tileSize + tileSize / 2);
             selectedTile = tiles[selectedCoords];
             battleMenu.OptionChoosen += battleMenu_OptionChoosen;
+            itemMenu.OptionChoosen += itemMenu_OptionChoosen;
+        }
+
+        void itemMenu_OptionChoosen(object sender, EventArgs e)
+        {
+            int index = (int)sender;
+            switch(itemMenu.Piece.ToCharacter().Items[index].ItemType)
+            {
+                case ItemType.Weapon :
+                    itemMenu.Piece.ToCharacter().Weapon = (Weapon)itemMenu.Piece.ToCharacter().Items[index];
+                    turnorder = TurnOrder.BattleChoice;
+                    break;
+                case ItemType.Usable :
+                    break;
+                case ItemType.Ect :
+                    break;
+            }
         }
 
         void battleMenu_OptionChoosen(object sender, EventArgs e)
@@ -75,6 +98,7 @@ namespace FireEmblem
             else if (name == "Items")
             {
                 turnorder = TurnOrder.Items;
+                itemMenu.Piece = battleMenu.Piece;
             }
             else if (name == "Wait")
             {
@@ -207,7 +231,7 @@ namespace FireEmblem
                             character.HasAttacked = true;
                             tiles[MoveBackLocation].Piece = character;
                             Character enemy = tiles[selectedCoords].Piece.ToCharacter();
-                            enemy.CurrentHealth -= character.TotalStats.Strength - enemy.TotalStats.Defense;
+                            enemy.CurrentHealth -= character.TotalStats.Strength + character.Weapon.Might - enemy.TotalStats.Defense;
                             tiles[selectedCoords].Piece = enemy;
                             if(enemy.CurrentHealth <= 0)
                             {
@@ -223,6 +247,7 @@ namespace FireEmblem
                     }
                     break;
                 case TurnOrder.Items:
+                    itemMenu.Update(gameTime);
                     if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
                     {
                         turnorder = TurnOrder.BattleChoice;
@@ -248,6 +273,10 @@ namespace FireEmblem
             if (turnorder == TurnOrder.BattleChoice)
             {
                 battleMenu.Draw(spriteBatch);
+            }
+            if(turnorder == TurnOrder.Items)
+            {
+                itemMenu.Draw(spriteBatch);
             }
         }
 

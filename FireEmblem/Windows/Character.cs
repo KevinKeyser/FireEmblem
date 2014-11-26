@@ -22,6 +22,20 @@ namespace FireEmblem
             }
         }
 
+        private Item[] items = new Item[5];
+
+        public Item[] Items
+        {
+            get
+            {
+                return items;
+            }
+            set
+            {
+                items = value;
+            }
+        }
+
         public bool IsDead = false;
         private CharacterClass characterClass;
 
@@ -88,7 +102,7 @@ namespace FireEmblem
 
         public override string ToString()
         {
-            return string.Format("Current Hp : {0}\n{1}", currentHealth, TotalStats.ToString());
+            return string.Format("Class : {2}\nWeapon : {3}\nCurrent Hp : {0}\n{1}", currentHealth, TotalStats.ToString(), characterClass.Name, weapon);
         }
     }
 }

@@ -6,32 +6,27 @@ using System.Text;
 
 namespace FireEmblem
 {
-    public class Weapon
+    public class Weapon : Item
     {
-        public string Name;
         public char Rank;
-        public int UsesLeft;
-        public int UsesMax;
+        public int ConsecutiveAttacks;
         public int Might;
         public int Hit;
         public int Critical;
-        public int Value;
         public int MinRange;
         public int MaxRange;
         public CharacterStatistics Special;
         public WeaponType WeaponType;
-        public Weapon(string name, char rank, int usesmax, int might, int hit, int critical, int value, int minrange, int maxrange, CharacterStatistics special, WeaponType weaponType)
+        public Weapon(string name, char rank, int might, int hit, int critical, int minRange, int maxRange, int usesMax, int priceValue, CharacterStatistics special, WeaponType weaponType)
+            : base(name, usesMax, priceValue, ItemType.Weapon)
         {
             Name = name;
             Rank = rank.ToString().ToUpper()[0];
-            UsesMax = usesmax;
-            UsesLeft = UsesMax;
             Might = might;
             Hit = hit;
             Critical = critical;
-            Value = value;
-            MinRange = minrange;
-            MaxRange = maxrange;
+            MinRange = minRange;
+            MaxRange = maxRange;
             Special = special;
             WeaponType = weaponType;
         }
