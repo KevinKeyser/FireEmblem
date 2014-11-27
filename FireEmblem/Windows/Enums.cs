@@ -11,7 +11,8 @@ namespace FireEmblem
         Moving,
         BattleChoice,
         Attack,
-        Items
+        Items,
+        End
     }
     public enum Terrian
     {

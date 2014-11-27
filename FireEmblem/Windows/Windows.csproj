@@ -39,6 +39,7 @@
     <Compile Include="Character.cs" />
     <Compile Include="CharacterClass.cs" />
     <Compile Include="CharacterStatistics.cs" />
+    <Compile Include="EndWindow.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="GameApplication.cs" />
     <Compile Include="GameBoard.cs" />

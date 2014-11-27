@@ -56,7 +56,7 @@ namespace FireEmblem
             gameBoard.Draw(spriteBatch);
             if (gameBoard.selectedTile != null)
             {
-                spriteBatch.DrawString(font, gameBoard.turnorder.ToString() + "\n" + gameBoard.selectedTile.ToString(), new Vector2(Global.ScreenWidth - 300, 0), Color.Black);
+                spriteBatch.DrawString(font, gameBoard.turnOrder.ToString() + "\n" + gameBoard.selectedTile.ToString(), new Vector2(Global.ScreenWidth - 300, 0), Color.Black);
             }
             spriteBatch.End();
 
