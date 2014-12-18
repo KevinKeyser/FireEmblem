@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,11 +9,106 @@ namespace FireEmblem
 {
     public static class Info
     {
+        //Ana (12 across)
+        //start with 2 px offset on y
+        //rect - 32, 32
+        // higher models 32, 35 any flying mount
+        //DarkFlier
+        //WyvernRider/Lord
+        //GriffonRider
+        //
+
+        public static Dictionary<CharacterName, Dictionary<ClassName, Texture2D>> Images = new Dictionary<CharacterName, Dictionary<ClassName, Texture2D>>();
+        public static Dictionary<ClassName, Dictionary<Team, Dictionary<AnimationName, Animation>>> Animations = new Dictionary<ClassName, Dictionary<Team, Dictionary<AnimationName, Animation>>>();
+
         public static Dictionary<WeaponName, Weapon> Weapons = new Dictionary<WeaponName, Weapon>()
         {
-            { WeaponName.BronzeSword,   new Weapon("Bronze Sword",  'E', 3, 100, 0, 1, 1, 50, 350,  new CharacterStatistics(), WeaponType.Sword) },
-            { WeaponName.IronSword,     new Weapon("Iron Sword",    'D', 5, 95, 0, 1, 1, 40, 520,   new CharacterStatistics(), WeaponType.Sword) }
+            { WeaponName.BronzeSword,       new Weapon("Bronze Sword",      'E', 3, 100,0, 1, 1, new UnitType[] {},                                             50,350,  1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.IronSword,         new Weapon("Iron Sword",        'D', 5, 95, 0, 1, 1, new UnitType[] {},                                             40,520,  1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.SteelSword,        new Weapon("Steel Sword",       'C', 8, 90, 0, 1, 1, new UnitType[] {},                                             35,840,  1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.SilverSword,       new Weapon("Silver Sword",      'B', 11,85, 0, 1, 1, new UnitType[] {},                                             30,1410, 1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.BraveSword,        new Weapon("Brave Sword",       'A', 9, 80, 0, 1, 1, new UnitType[] {},                                             30,2100, 2,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.Armourslayer,      new Weapon("Armourslayer",      'D', 8, 80, 0, 1, 1, new UnitType[] { UnitType.Armored },                           25,1450, 1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.Wyrmslayer,        new Weapon("Wyrmslayer",        'D', 8, 80, 0, 1, 1, new UnitType[] { UnitType.Dragons },                           25,1500, 1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.KillingEdge,       new Weapon("Killing Edge",      'C', 9, 90, 30,1, 1, new UnitType[] {},                                             30,1470, 1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.LevinSword,        new Weapon("Levin Sword",       'C', 10,80, 0, 1, 2, new UnitType[] {},                                             25,1600, 1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.Rapier,            new Weapon("Rapier",            'E', 5, 90, 10,1, 1, new UnitType[] { UnitType.Beasts, UnitType.Armored },          35,1600, 1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.NobleRapier,       new Weapon("Noble Rapier",      'C', 8, 85, 10,1, 1, new UnitType[] { UnitType.Beasts, UnitType.Armored },          25,2100, 1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.Missiletainn,      new Weapon("Missiletainn",      'C', 8, 85, 10,1, 1, new UnitType[] {},                                             35,1050, 1,                     new CharacterStatistics(0,0,0,1,0,0,0,0), WeaponType.Sword) },
+            { WeaponName.Sol,               new Weapon("Sol",               'B', 12,85, 5, 1, 1, new UnitType[] {},                                             30,0,    1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.Amatsu,            new Weapon("Amatsu",            'A', 12,60, 5, 1, 2, new UnitType[] {},                                             30,0,    1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.Falchion,          new Weapon("Falchion",          'E', 5, 80, 0, 1, 1, new UnitType[] { UnitType.Dragons },                           -1,-1,   1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.ExaltedFalchion,   new Weapon("Exalted Falchion",  'E', 15,80, 10,1, 1, new UnitType[] { UnitType.Dragons, UnitType.FellDragons },     -1,-1,   1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.ParallelFalchion,  new Weapon("Parallel Falchion", 'E', 12,80, 5, 1, 1, new UnitType[] { UnitType.Dragons, UnitType.FellDragons },     -1,-1,   1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.Mercurius,         new Weapon("Mercurius",         'A', 17,95, 5, 1, 1, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.Tyfing,            new Weapon("Tyrfing",           'A', 15,85, 10,1, 1, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(0,0,0,0,0,0,5,0), WeaponType.Sword) },
+            { WeaponName.Balmung,           new Weapon("Balmung",           'A', 13,90, 10,1, 1, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(0,0,0,0,5,0,0,0), WeaponType.Sword) },
+            { WeaponName.Mystletainn,       new Weapon("Mystletainn",       'A', 14,85, 15,1, 1, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(0,0,0,5,0,0,0,0), WeaponType.Sword) },
+            { WeaponName.SolKatti,          new Weapon("Sol Katti",         'A', 8, 100,50,1, 1, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(0,0,0,0,0,0,5,0), WeaponType.Sword) },
+            { WeaponName.Ragnell,           new Weapon("Ragnell",           'A', 15,70, 0, 1, 2, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(0,0,0,0,0,5,0,0), WeaponType.Sword) },
+            { WeaponName.TreeBranch,        new Weapon("Tree Branch",       'E', 1, 100,0, 1, 1, new UnitType[] {},                                             20,100,  1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.GlassSword,        new Weapon("Glass Sword",       'E', 11,85, 0, 1, 1, new UnitType[] {},                                             3, 600,  1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.SoothingSword,     new Weapon("Soothing Sword",    'D', 8, 85, 0, 1, 1, new UnitType[] {},                                             10,920,  1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.SuperiorEdge,      new Weapon("Superior Edge",     'B', 11,80, 0, 1, 1, new UnitType[] {},                                             10,1950, 1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.LeifsBlade,        new Weapon("Leif's Blade",      'D', 4, 95, 30,1, 1, new UnitType[] {},                                             20,820,  1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.RoysBlade,         new Weapon("Roy's Blade",       'D', 8, 95, 5, 1, 1, new UnitType[] {},                                             25,900,  1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.EliwoodsBlade,     new Weapon("Eliwood's Blade",   'C', 10,85, 5, 1, 1, new UnitType[] {},                                             20,960,  1,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.EirikasBlade,      new Weapon("Eirika's Blade",    'C', 6, 95, 10,1, 1, new UnitType[] {},                                             20,1220, 2,                     new CharacterStatistics(), WeaponType.Sword) },
+            { WeaponName.SeliphsBlade,      new Weapon("Seliph's Blade",    'B', 12,90, 15,1, 1, new UnitType[] {},                                             15,1530, 1,                     new CharacterStatistics(0,0,0,0,2,0,2,0), WeaponType.Sword) },
+            { WeaponName.AlmsBlade,         new Weapon("Alm's Blade",       'B', 15,75, 10,1, 1, new UnitType[] {},                                             10,1630, 1,                     new CharacterStatistics(), WeaponType.Sword) },
+
+            { WeaponName.BronzeLance,       new Weapon("Bronze Lance",      'E', 3, 90, 0, 1, 1, new UnitType[] {},                                             50,350,  1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.IronLance,         new Weapon("Iron Lance",        'D', 6, 85, 0, 1, 1, new UnitType[] {},                                             40,560,  1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.SteelLance,        new Weapon("Steel Lance",       'C', 9, 80, 0, 1, 1, new UnitType[] {},                                             35,910,  1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.SilverLance,       new Weapon("Silver Lance",      'B', 13,75, 0, 1, 1, new UnitType[] {},                                             30,1560, 1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.BraveLance,        new Weapon("Brave Lance",       'A', 10,70, 0, 1, 1, new UnitType[] {},                                             30,2220, 2,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.Javelin,           new Weapon("Javelin",           'D', 2, 80, 0, 1, 2, new UnitType[] {},                                             25,700,  1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.ShortSpear,        new Weapon("Short Spear",       'C', 5, 75, 0, 1, 2, new UnitType[] {},                                             25,1600, 1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.Spear,             new Weapon("Spear",             'B', 8, 70, 0, 1, 2, new UnitType[] {},                                             25,2400, 1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.BeastKiller,       new Weapon("Beast Killer",      'D', 9, 70, 0, 1, 1, new UnitType[] { UnitType.Beasts },                            25,1650, 1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.BlessedLance,      new Weapon("Blessed Lance",     'C', 11,70, 0, 1, 1, new UnitType[] { UnitType.Monsters },                          35,1540, 1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.KillerLance,       new Weapon("Killer Lance",      'C', 10,80, 30,1, 1, new UnitType[] {},                                             30,1680, 1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.Luna,              new Weapon("Luna",              'B', 14,80, 5, 1, 1, new UnitType[] {},                                             30,0,    1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.Gradivus,          new Weapon("Gradivus",          'A', 19,85, 5, 1, 2, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.GaeBolg,           new Weapon("Gáe Bolg",          'A', 15,75, 10,1, 1, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(0,0,0,0,0,5,0,0), WeaponType.Lance)  },
+            { WeaponName.Gungnir,           new Weapon("Gungnir",           'A', 16,70, 10,1, 1, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(0,5,0,0,0,0,0,0), WeaponType.Lance)  },
+            { WeaponName.Log,               new Weapon("Log",               'E', 1, 90, 0, 1, 1, new UnitType[] {},                                             20,100,  1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.GlassLance,        new Weapon("Glass Lance",       'E', 13,75, 0, 1, 1, new UnitType[] {},                                             3, 600,  1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.MiniatureLance,    new Weapon("Miniature Lance",   'D', 1, 55, 35,1, 2, new UnitType[] {},                                             10,650,  1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.Shockstick,        new Weapon("Shockstick",        'C', 11,85, 10,1, 1, new UnitType[] {},                                             20,1200, 1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.SuperiorLance,     new Weapon("Superior Lance",    'B', 13,70, 0, 1, 1, new UnitType[] {},                                             10,2100, 1,                     new CharacterStatistics(), WeaponType.Lance)  },
+            { WeaponName.FinnsLance,        new Weapon("Finn's Lance",      'D', 8, 85, 10,1, 1, new UnitType[] {},                                             25,950,  1,                     new CharacterStatistics(0,0,0,0,0,2,2,0,0), WeaponType.Lance)  },
+            { WeaponName.EphraimsLance,     new Weapon("Ephraim's Lance",   'C', 11,80, 10,1, 1, new UnitType[] {},                                             20,1220, 1,                     new CharacterStatistics(0,2,0,0,2,0,0,0), WeaponType.Lance)  },
+            { WeaponName.SigurdsLance,      new Weapon("Sigurd's Lance",    'B', 14,85, 15,1, 1, new UnitType[] {},                                             15,1920, 1,                     new CharacterStatistics(), WeaponType.Lance)  },
+
+            { WeaponName.BronzeAxe,         new Weapon("Bronze Axe",        'E', 4, 80, 0, 1, 1, new UnitType[] {},                                             50,400,  1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.IronAxe,           new Weapon("Iron Axe",          'D', 7, 75, 0, 1, 1, new UnitType[] {},                                             40,600,  1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.SteelAxe,          new Weapon("Steel Axe",         'C', 11,70, 0, 1, 1, new UnitType[] {},                                             35,980,  1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.SilverAxe,         new Weapon("Silver Axe",        'B', 15,65, 0, 1, 1, new UnitType[] {},                                             30,1740, 1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.BraveAxe,          new Weapon("Brave Axe",         'A', 12,60, 0, 1, 1, new UnitType[] {},                                             30,2400, 2,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.HandAxe,           new Weapon("Hand Axe",          'D', 3, 70, 0, 1, 2, new UnitType[] {},                                             25,750,  1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.ShortAxe,          new Weapon("Short Axe",         'C', 7, 65, 0, 1, 2, new UnitType[] {},                                             25,1750, 1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.Tomahawk,          new Weapon("Tomahawk",          'B', 10,60, 0, 1, 2, new UnitType[] {},                                             25,2550, 1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.Hammer,            new Weapon("Hammer",            'D', 10,60, 0, 1, 1, new UnitType[] { UnitType.Armored },                           25,1850, 1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.BoltAxe,           new Weapon("Bolt Axe",          'B', 14,70, 5, 1, 2, new UnitType[] {},                                             30,1920, 1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.KillerAxe,         new Weapon("Killer Axe",        'C', 12,70, 30,1, 1, new UnitType[] {},                                             30,1860, 1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.Vegeance,          new Weapon("Vegeance",          'B', 16,75, 5, 1, 1, new UnitType[] {},                                             30,0,    1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.WolfBerg,          new Weapon("Wolf Berg",         'A', 18,75, 5, 1, 2, new UnitType[] {},                                             35,0,    1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.Hauteclere,        new Weapon("Hauteclere",        'A', 21,70, 5, 1, 1, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.Helswath,          new Weapon("Helswath",          'A', 18,60, 10,1, 2, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(0,0,0,0,0,5,0,0), WeaponType.Axe) },
+            { WeaponName.Armads,            new Weapon("Armads",            'A', 17,80, 10,1, 1, new UnitType[] {},                                             25,0,    1,                     new CharacterStatistics(0,0,0,0,0,5,0,0), WeaponType.Axe) },
+            { WeaponName.Ladle,             new Weapon("Ladle",             'E', 1, 80, 0, 1, 1, new UnitType[] {},                                             20,100,  1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.GlassAxe,          new Weapon("Glass Axe",         'E', 15,65, 0, 1, 1, new UnitType[] {},                                             3, 600,  1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.ImposingAxe,       new Weapon("Imposing Axe",      'D', 14,35, 10,1, 1, new UnitType[] {},                                             10,830,  1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.VolantAxe,         new Weapon("Volant Axe",        'C', 8, 55, 0, 1, 2, new UnitType[] { UnitType.Flying },                            10,1510, 1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.SuperiorAxe,       new Weapon("Superior Axe",      'B', 15,60, 0, 1, 1, new UnitType[] {},                                             10,2150, 1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.OrsinsHatchet,     new Weapon("Orsin's Axe",       'D', 4, 85, 5, 1, 2, new UnitType[] {},                                             20,960,  1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.TitaniasAxe,       new Weapon("Titania's Axe",     'C', 12,80, 10,1, 1, new UnitType[] {},                                             20,1320, 1,                     new CharacterStatistics(), WeaponType.Axe) },
+            { WeaponName.HectorsAxe,        new Weapon("Hector's Axe",      'B', 15,75, 15,1, 1, new UnitType[] {},                                             15,2010, 1,                     new CharacterStatistics(0,2,0,0,0,2,0,0), WeaponType.Axe) },
+
+            { WeaponName.BronzeBow,         new Weapon("Bronze Bow",        'E', 3, 90, 0, 2, 2, new UnitType[] { UnitType.Flying }, 50, 350, 1,   new CharacterStatistics(), WeaponType.Bow) },
         };
+
 
         public static Dictionary<ClassName, CharacterClass> Classes = new Dictionary<ClassName, CharacterClass>()
         {

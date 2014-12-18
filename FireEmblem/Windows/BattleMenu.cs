@@ -81,7 +81,7 @@ namespace FireEmblem
                     else
                     {
                         int index = 0;
-                        for (int i = 1; i < Items.Count; i++)
+                        for (int i = 0; i < Items.Count; i++)
                         {
                             Items[i].Bounds = new Rectangle(Bounds.X, (int)Items[i].Position.Y - Items[0].Bounds.Height, Items[i].Bounds.Width, Items[i].Bounds.Height);
                             if (Items[i].Name == "Items")

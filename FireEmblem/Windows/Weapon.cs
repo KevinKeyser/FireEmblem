@@ -9,15 +9,17 @@ namespace FireEmblem
     public class Weapon : Item
     {
         public char Rank;
-        public int ConsecutiveAttacks;
         public int Might;
         public int Hit;
         public int Critical;
         public int MinRange;
         public int MaxRange;
+        public int ConsecutiveAttacks;
         public CharacterStatistics Special;
         public WeaponType WeaponType;
-        public Weapon(string name, char rank, int might, int hit, int critical, int minRange, int maxRange, int usesMax, int priceValue, CharacterStatistics special, WeaponType weaponType)
+        public UnitType[] Effects;
+
+        public Weapon(string name, char rank, int might, int hit, int critical, int minRange, int maxRange, UnitType[] effects, int usesMax, int priceValue, int consecutiveAttacks, CharacterStatistics special, WeaponType weaponType)
             : base(name, usesMax, priceValue, ItemType.Weapon)
         {
             Name = name;
@@ -27,8 +29,15 @@ namespace FireEmblem
             Critical = critical;
             MinRange = minRange;
             MaxRange = maxRange;
+            Effects = effects;
+            ConsecutiveAttacks = consecutiveAttacks;
             Special = special;
             WeaponType = weaponType;
+        }
+
+        public override object Clone()
+        {
+            return new Weapon(Name, Rank, Might, Hit, Critical, MinRange, MaxRange, Effects, UsesMax, PriceValue, ConsecutiveAttacks, Special, WeaponType) { UsesCurrent = this.UsesCurrent };
         }
     }
 }

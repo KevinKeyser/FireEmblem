@@ -12,6 +12,7 @@ namespace FireEmblem
 
     public class GameBoard
     {
+        public Team Turn;
         Texture2D pixel;
         public TurnOrder lastTurnOrder;
         public TurnOrder turnOrder;
@@ -45,8 +46,10 @@ namespace FireEmblem
 
         public GameBoard(ContentManager Content, int tileSize, int boardWidth, int boardHeight)
         {
+            Random random = new Random();
+            Turn = (Team)random.Next(2);
             pixel = new Texture2D(Content.Load<Texture2D>("Tile").GraphicsDevice, 1, 1);
-            pixel.SetData<Color>(new Color[] {Color.White});
+            pixel.SetData<Color>(new Color[] { Color.White });
             lastWeapon = null;
             turnOrder = TurnOrder.Picking;
             this.tileSize = tileSize;
@@ -62,11 +65,11 @@ namespace FireEmblem
                     tiles.Add(new Vector2(x, y), new Tile(Content.Load<Texture2D>("Tile"), new Vector2(tileSize * x, tileSize * y), tileSize));
                 }
             }
-            tiles[new Vector2(5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(5)].Rectangle, new CharacterStatistics(), Info.Classes[ClassName.Mercenary]) { Weapon = Info.Weapons[WeaponName.IronSword] };
-            tiles[new Vector2(5)].Piece.ToCharacter().Items = new Item[] { new HealthItem("Potion", 0, 0, 10, 3, 1000), Info.Weapons[WeaponName.BronzeSword], Info.Weapons[WeaponName.IronSword] };
-            tiles[new Vector2(3, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(3, 5)].Rectangle, new CharacterStatistics(), Info.Classes[ClassName.Myrmidon]) { Weapon = Info.Weapons[WeaponName.IronSword] };
-            tiles[new Vector2(4, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(4, 5)].Rectangle, new CharacterStatistics(), Info.Classes[ClassName.Lord]) { Weapon = Info.Weapons[WeaponName.IronSword] };
-            tiles[new Vector2(2, 5)].Piece = new Character(Content.Load<Texture2D>("Circle"), tiles[new Vector2(2, 5)].Rectangle, new CharacterStatistics(), Info.Classes[ClassName.Tactician]) { Weapon = Info.Weapons[WeaponName.IronSword] };
+            tiles[new Vector2(5)].Piece = new Character(CharacterName.Anna, tiles[new Vector2(5, 5)].Rectangle, new CharacterStatistics(), ClassName.Archer, Team.Red);
+            tiles[new Vector2(5)].Piece.ToCharacter().Items = new Item[] { new HealthItem("Potion", 0, 0, 10, 3, 1000), (Weapon)Info.Weapons[WeaponName.BronzeBow].Clone() };
+            tiles[new Vector2(3, 5)].Piece = new Character(CharacterName.Brady, tiles[new Vector2(3, 5)].Rectangle, new CharacterStatistics(), ClassName.GriffonRider, Team.Blue);
+            tiles[new Vector2(3, 5)].Piece.ToCharacter().Items = new Item[] { new HealthItem("Potion", 0, 0, 10, 3, 1000), (Weapon)Info.Weapons[WeaponName.BronzeSword].Clone(), (Weapon)Info.Weapons[WeaponName.BronzeAxe].Clone() };
+            
             battleMenu = new BattleMenu(new Vector2(0, 0), new Vector2(200, 400), Content.Load<SpriteFont>("Font"), pixel);
             itemMenu = new ItemMenu(Vector2.Zero, new Vector2(200, 400), Content.Load<SpriteFont>("Font"), pixel);
             endMenu = new EndMenu(Vector2.Zero, new Vector2(200, 400), Content.Load<SpriteFont>("Font"), pixel);
@@ -76,40 +79,6 @@ namespace FireEmblem
             battleMenu.OptionChoosen += battleMenu_OptionChoosen;
             itemMenu.OptionChoosen += itemMenu_OptionChoosen;
             endMenu.OptionChoosen += endMenu_OptionChoosen;
-        }
-
-        void endMenu_OptionChoosen(object sender, EventArgs e)
-        {
-            for (int y = 0; y < boardHeight; y++)
-            {
-                for (int x = 0; x < boardWidth; x++)
-                {
-                    if (tiles[new Vector2(x, y)].Piece != null && tiles[new Vector2(x, y)].Piece.ToCharacter() != null)
-                    {
-                        tiles[new Vector2(x, y)].Piece.ToCharacter().HasMoved = false;
-                        tiles[new Vector2(x, y)].Piece.ToCharacter().HasAttacked = false;
-                    }
-                }
-            }
-            lastTurnOrder = turnOrder;
-            turnOrder = TurnOrder.Picking;
-        }
-
-        void itemMenu_OptionChoosen(object sender, EventArgs e)
-        {
-            int index = (int)sender;
-            switch(itemMenu.Piece.ToCharacter().Items[index].ItemType)
-            {
-                case ItemType.Weapon :
-                    itemMenu.Piece.ToCharacter().Weapon = (Weapon)itemMenu.Piece.ToCharacter().Items[index];
-                    lastTurnOrder = turnOrder;
-                    turnOrder = TurnOrder.Attack;
-                    break;
-                case ItemType.Usable :
-                    break;
-                case ItemType.Ect :
-                    break;
-            }
         }
 
         void battleMenu_OptionChoosen(object sender, EventArgs e)
@@ -134,6 +103,72 @@ namespace FireEmblem
                 character.HasMoved = true;
                 tiles[lastCoords].Piece = character;
             }
+            battleMenu.SelectedIndex = 0;
+        }
+
+        void itemMenu_OptionChoosen(object sender, EventArgs e)
+        {
+            int index = (int)sender;
+            switch (itemMenu.Piece.ToCharacter().Items[index].ItemType)
+            {
+                case ItemType.Weapon :
+                    itemMenu.Piece.ToCharacter().Weapon = (Weapon)itemMenu.Piece.ToCharacter().Items[index];
+                    lastTurnOrder = turnOrder;
+                    turnOrder = TurnOrder.BattleChoice;
+                    break;
+                case ItemType.Health :
+                    itemMenu.Piece.ToCharacter().CurrentHealth += ((HealthItem)itemMenu.Piece.ToCharacter().Items[index]).Heal(itemMenu.Piece.ToCharacter().TotalStats.HealthPoints);
+                    battleMenu.IsItem = false;
+                    battleMenu.IsAttack = false;
+                    lastTurnOrder = turnOrder;
+                    turnOrder = TurnOrder.BattleChoice;
+                    itemMenu.Piece.ToCharacter().Items[index].UsesCurrent--; 
+                    break;
+                case ItemType.StatModifier:
+                    break;
+                case ItemType.Ect :
+                    break;
+            }
+            itemMenu.SelectedIndex = 0;
+        }
+
+        void endMenu_OptionChoosen(object sender, EventArgs e)
+        {
+            for (int y = 0; y < boardHeight; y++)
+            {
+                for (int x = 0; x < boardWidth; x++)
+                {
+                    if (tiles[new Vector2(x, y)].Piece != null && tiles[new Vector2(x, y)].Piece.ToCharacter() != null)
+                    {
+                        tiles[new Vector2(x, y)].Piece.ToCharacter().HasMoved = false;
+                        tiles[new Vector2(x, y)].Piece.ToCharacter().HasAttacked = false;
+                    }
+                }
+            }
+            endMenu.SelectedIndex = 0;
+            Turn = (Team)((((int)Turn) + 1) % 2);
+            lastTurnOrder = turnOrder;
+            turnOrder = TurnOrder.Picking;
+        }
+
+        private void keyMovementUpdate()
+        {
+            if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Right))
+            {
+                selectedCoords.X = MathHelper.Clamp(selectedCoords.X + 1, 0, boardWidth - 1);
+            }
+            if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Left))
+            {
+                selectedCoords.X = MathHelper.Clamp(selectedCoords.X - 1, 0, boardWidth - 1);
+            }
+            if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Up))
+            {
+                selectedCoords.Y = MathHelper.Clamp(selectedCoords.Y - 1, 0, boardHeight - 1);
+            }
+            if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Down))
+            {
+                selectedCoords.Y = MathHelper.Clamp(selectedCoords.Y + 1, 0, boardHeight - 1);
+            }
         }
 
         public void Update(GameTime gameTime)
@@ -146,41 +181,16 @@ namespace FireEmblem
                     tiles[new Vector2(x, y)].Color = Color.White;
                 }
             }
-            if (turnOrder != TurnOrder.BattleChoice && turnOrder != TurnOrder.Items && turnOrder != TurnOrder.End)
-            {
-                if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Right))
-                {
-                    selectedCoords.X = MathHelper.Clamp(selectedCoords.X + 1, 0, boardWidth - 1);
-                }
-                if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Left))
-                {
-                    selectedCoords.X = MathHelper.Clamp(selectedCoords.X - 1, 0, boardWidth - 1);
-                }
-                if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Up))
-                {
-                    selectedCoords.Y = MathHelper.Clamp(selectedCoords.Y - 1, 0, boardHeight - 1);
-                }
-                if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Down))
-                {
-                    selectedCoords.Y = MathHelper.Clamp(selectedCoords.Y + 1, 0, boardHeight - 1);
-                }
-            }
             switch (turnOrder)
             {
-                case TurnOrder.End:
-                    endMenu.Update(gameTime);
-                    if(InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
-                    {
-                        lastTurnOrder = turnOrder;
-                        turnOrder = TurnOrder.Picking;
-                    }
-                    break;
+                
                 case TurnOrder.Picking:
+                    keyMovementUpdate();
                     selectedTile.Color = Color.Blue;
                     selectedTile = tiles[selectedCoords];
                     if (InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter))
                     {
-                        if (selectedTile.Piece != null && selectedTile.Piece.ToCharacter() != null ? !selectedTile.Piece.ToCharacter().HasMoved : false)
+                        if (selectedTile.Piece != null && selectedTile.Piece.ToCharacter() != null ? selectedTile.Piece.ToCharacter().Team == Turn ? !selectedTile.Piece.ToCharacter().HasMoved : false : false)
                         {
                             lastTurnOrder = turnOrder;
                             turnOrder = TurnOrder.Moving;
@@ -191,12 +201,13 @@ namespace FireEmblem
                         lastTurnOrder = turnOrder;
                         turnOrder = TurnOrder.End;
                     }
-                    if (selectedTile.Piece != null && selectedTile.Piece.ToCharacter() != null ? !selectedTile.Piece.ToCharacter().HasMoved : false)
+                    if (selectedTile.Piece != null && selectedTile.Piece.ToCharacter() != null ? selectedTile.Piece.ToCharacter().Team == Turn ? !selectedTile.Piece.ToCharacter().HasMoved : false : false)
                     {
                         ShowMovement();
                     }
                     break;
                 case TurnOrder.Moving:
+                    keyMovementUpdate();
                     ShowMovement();
                     if (tiles[selectedCoords].Color == Color.Purple)
                     {
@@ -253,6 +264,7 @@ namespace FireEmblem
                     }
                     break;
                 case TurnOrder.Attack:
+                    keyMovementUpdate();
                     ShowAttackRange(tiles[lastCoords]);
                     if (tiles[selectedCoords].Color == Color.Green)
                     {
@@ -276,9 +288,8 @@ namespace FireEmblem
                             Character enemy = tiles[selectedCoords].Piece.ToCharacter();
                             enemy.CurrentHealth -= character.TotalStats.Strength + character.Weapon.Might - enemy.TotalStats.Defense;
                             tiles[selectedCoords].Piece = enemy;
-                            if(enemy.CurrentHealth <= 0)
+                            if(enemy.IsDead)
                             {
-                                enemy.IsDead = true;
                                 tiles[selectedCoords].Piece = null;
                             }
                         }
@@ -295,6 +306,14 @@ namespace FireEmblem
                     {
                         tiles[selectedCoords].Piece.ToCharacter().Weapon = lastWeapon;
                         turnOrder = TurnOrder.BattleChoice;
+                    }
+                    break;
+                case TurnOrder.End:
+                    endMenu.Update(gameTime);
+                    if(InputManager.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
+                    {
+                        lastTurnOrder = turnOrder;
+                        turnOrder = TurnOrder.Picking;
                     }
                     break;
             }
@@ -314,17 +333,23 @@ namespace FireEmblem
             }
             spriteBatch.End();
             spriteBatch.Begin();
-            if (turnOrder == TurnOrder.BattleChoice)
+            switch(turnOrder)
             {
-                battleMenu.Draw(spriteBatch);
-            }
-            if(turnOrder == TurnOrder.Items)
-            {
-                itemMenu.Draw(spriteBatch);
-            }
-            if(turnOrder == TurnOrder.End)
-            {
-                endMenu.Draw(spriteBatch);
+                case TurnOrder.Picking:
+                    break;
+                case TurnOrder.Moving:
+                    break;
+                case TurnOrder.BattleChoice:
+                    battleMenu.Draw(spriteBatch);
+                    break;
+                case TurnOrder.Attack:
+                    break;
+                case TurnOrder.Items:
+                    itemMenu.Draw(spriteBatch);
+                    break;
+                case TurnOrder.End:
+                    endMenu.Draw(spriteBatch);
+                    break;
             }
         }
 
@@ -335,6 +360,8 @@ namespace FireEmblem
             {
                 moveableTiles = new List<Vector2>();
                 attackableTiles = new List<Vector2>();
+                List<Vector2> moveThroughTiles = new List<Vector2>();
+
                 moveableTiles.Add(new Vector2(selectedTile.Position.X / selectedTile.Width, selectedTile.Position.Y / selectedTile.Height));
                 int currentMovement = 0;
                 int currentIndex = 0;
@@ -343,20 +370,25 @@ namespace FireEmblem
                     lastMoveTiles = new List<Vector2>();
                     for (int i = currentIndex; i < moveableTiles.Count; i++)
                     {
-                        Vector2[] vectors= new Vector2[]{
+                        Vector2[] vectors = new Vector2[]{
                             Vector2.Clamp(new Vector2(moveableTiles[i].X, moveableTiles[i].Y - 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1)),
                             Vector2.Clamp(new Vector2(moveableTiles[i].X, moveableTiles[i].Y + 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1)),
                             Vector2.Clamp(new Vector2(moveableTiles[i].X + 1, moveableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1)),
                             Vector2.Clamp(new Vector2(moveableTiles[i].X - 1, moveableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1))
-                    };
+                        };
 
                         foreach(Vector2 vect in vectors)
                         {
-                            if (!moveableTiles.Contains(vect) && !lastMoveTiles.Contains(vect))
+                            if (!moveableTiles.Contains(vect) && !lastMoveTiles.Contains(vect) && !moveThroughTiles.Contains(vect))
                             {
                                 if (tiles[vect].Piece == null)
                                 {
                                     lastMoveTiles.Add(vect);
+                                }
+                                else if(tiles[vect].Piece.ToCharacter().Team == selectedTile.Piece.ToCharacter().Team)
+                                {
+                                    lastMoveTiles.Add(vect);
+                                    moveThroughTiles.Add(vect);
                                 }
                                 else
                                 {
@@ -369,7 +401,11 @@ namespace FireEmblem
                     currentMovement++;
                     moveableTiles.AddRange(lastMoveTiles);
                 }
-
+                while(moveThroughTiles.Count > 0)
+                {
+                    moveableTiles.Remove(moveThroughTiles[0]);
+                    moveThroughTiles.RemoveAt(0);
+                }
                 for (int i = 0; i < moveableTiles.Count; i++)
                 {
                     tiles[moveableTiles[i]].Color = Color.Purple;
@@ -393,25 +429,21 @@ namespace FireEmblem
                     List<Vector2> lastAttackTiles = new List<Vector2>();
                     for (int i = currentIndex; i < attackableTiles.Count; i++)
                     {
-                        Vector2 aboveTile = Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y - 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                        Vector2 belowTile = Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y + 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                        Vector2 rightTile = Vector2.Clamp(new Vector2(attackableTiles[i].X + 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                        Vector2 leftTile = Vector2.Clamp(new Vector2(attackableTiles[i].X - 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                        if (!attackableTiles.Contains(aboveTile) && !lastAttackTiles.Contains(aboveTile) && !moveableTiles.Contains(aboveTile))
+                        Vector2[] vectors = new Vector2[]{
+                            Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y - 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1)),
+                            Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y + 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1)),
+                            Vector2.Clamp(new Vector2(attackableTiles[i].X + 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1)),
+                            Vector2.Clamp(new Vector2(attackableTiles[i].X - 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1))
+                        };
+                        foreach (Vector2 vect in vectors)
                         {
-                            lastAttackTiles.Add(aboveTile);
-                        }
-                        if (!attackableTiles.Contains(belowTile) && !lastAttackTiles.Contains(belowTile) && !moveableTiles.Contains(belowTile))
-                        {
-                            lastAttackTiles.Add(belowTile);
-                        }
-                        if (!attackableTiles.Contains(rightTile) && !lastAttackTiles.Contains(rightTile) && !moveableTiles.Contains(rightTile))
-                        {
-                            lastAttackTiles.Add(rightTile);
-                        }
-                        if (!attackableTiles.Contains(leftTile) && !lastAttackTiles.Contains(leftTile) && !moveableTiles.Contains(leftTile))
-                        {
-                            lastAttackTiles.Add(leftTile);
+                            if (!attackableTiles.Contains(vect) && !lastAttackTiles.Contains(vect) && !moveableTiles.Contains(vect))
+                            {
+                                if (tiles[vect].Piece != null && tiles[vect].Piece.ToCharacter().Team != selectedTile.Piece.ToCharacter().Team)
+                                {
+                                    lastAttackTiles.Add(vect);
+                                }
+                            }
                         }
                     }
                     currentIndex = attackableTiles.Count - 1;
@@ -441,29 +473,19 @@ namespace FireEmblem
                     List<Vector2> lastAttackTiles = new List<Vector2>();
                     for (int i = currentIndex; i < attackableTiles.Count; i++)
                     {
-                        Vector2 aboveTile = Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y - 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                        Vector2 belowTile = Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y + 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                        Vector2 rightTile = Vector2.Clamp(new Vector2(attackableTiles[i].X + 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                        Vector2 leftTile = Vector2.Clamp(new Vector2(attackableTiles[i].X - 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1));
-                        if (!attackableTiles.Contains(aboveTile) && !lastAttackTiles.Contains(aboveTile))
+                        Vector2[] vectors = new Vector2[]{
+                            Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y - 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1)),
+                            Vector2.Clamp(new Vector2(attackableTiles[i].X, attackableTiles[i].Y + 1), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1)),
+                            Vector2.Clamp(new Vector2(attackableTiles[i].X + 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1)),
+                            Vector2.Clamp(new Vector2(attackableTiles[i].X - 1, attackableTiles[i].Y), Vector2.Zero, new Vector2(boardWidth - 1, boardHeight - 1))
+                        };
+                        foreach (Vector2 vect in vectors)
                         {
-                            lastAttackTiles.Add(aboveTile);
-                            rangeTiles.Add(currentAttackRange);
-                        }
-                        if (!attackableTiles.Contains(belowTile) && !lastAttackTiles.Contains(belowTile))
-                        {
-                            lastAttackTiles.Add(belowTile);
-                            rangeTiles.Add(currentAttackRange);
-                        }
-                        if (!attackableTiles.Contains(rightTile) && !lastAttackTiles.Contains(rightTile))
-                        {
-                            lastAttackTiles.Add(rightTile);
-                            rangeTiles.Add(currentAttackRange);
-                        }
-                        if (!attackableTiles.Contains(leftTile) && !lastAttackTiles.Contains(leftTile))
-                        {
-                            lastAttackTiles.Add(leftTile);
-                            rangeTiles.Add(currentAttackRange);
+                            if (!attackableTiles.Contains(vect) && !lastAttackTiles.Contains(vect))
+                            {
+                                lastAttackTiles.Add(vect);
+                                rangeTiles.Add(currentAttackRange);
+                            }
                         }
                     }
                     currentIndex = attackableTiles.Count - 1;
@@ -474,7 +496,7 @@ namespace FireEmblem
                 rangeTiles.RemoveAt(0);
                 for (int i = 0; i < attackableTiles.Count; i++)
                 {
-                    if (tiles[attackableTiles[i]].Piece != null)
+                    if (tiles[attackableTiles[i]].Piece != null && tiles[attackableTiles[i]].Piece.ToCharacter().Team != tile.Piece.ToCharacter().Team)
                     {
                         if (rangeTiles[i] >= tile.Piece.ToCharacter().Weapon.MinRange && rangeTiles[i] <= tile.Piece.ToCharacter().Weapon.MaxRange)
                         {

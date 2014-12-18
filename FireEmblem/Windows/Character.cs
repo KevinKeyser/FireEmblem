@@ -7,17 +7,35 @@ using System.Text;
 
 namespace FireEmblem
 {
+    public enum Team
+    {
+        Red = 0,
+        Blue = 1,
+        Green = 2
+    }
     public class Character : GamePiece
     {
+
+        private Team team;
+
+        public Team Team
+        {
+            get { return team; }
+            set { team = value; }
+        }
+        
+        private Dictionary<AnimationName, Animation> animations;
+
         private Weapon weapon;
 
         public Weapon Weapon
         {
             get { return weapon; }
-            set { 
-                if(characterClass.UsableWeapons.Contains(value.WeaponType))
+            set
+            {
+                if (value != null && characterClass.UsableWeapons.Contains(value.WeaponType))
                 {
-                    weapon = value; 
+                    weapon = value;
                 }
             }
         }
@@ -56,9 +74,16 @@ namespace FireEmblem
         public int CurrentHealth
         {
             get { return currentHealth; }
-            set { currentHealth = value; }
+            set
+            {
+                currentHealth = MathHelper.Clamp(value, 0, TotalStats.HealthPoints);
+                if (currentHealth == 0)
+                {
+                    IsDead = true;
+                }
+            }
         }
-        
+
         private bool hasMoved;
 
         public bool HasMoved
@@ -74,20 +99,64 @@ namespace FireEmblem
             get { return hasAttacked; }
             set { hasAttacked = value; }
         }
-        
-        public Character(Texture2D texture, Rectangle rectangle, CharacterStatistics characterStats, CharacterClass characterClass)
-            : base(texture, rectangle, GamePieceType.Character)
+
+        private AnimationName currentAnimation;
+        public AnimationName CurrentAnimation
         {
+            get
+            {
+                return currentAnimation;
+            }
+            set
+            {
+                if(currentAnimation != value)
+                {
+                    animations[currentAnimation].Reset();
+                    currentAnimation = value;
+                }
+            }
+        }
+        private ClassName className;
+        public ClassName ClassName
+        {
+            get
+            {
+                return className;
+            }
+            set
+            {
+                if (Info.Images[characterName].ContainsKey(value))
+                {
+                    className = value;
+                }
+                else
+                {
+                    throw new ArgumentException(string.Format("Character {0} cannot have ClassName {1}", characterName, value));
+                }
+            }
+        }
+        private CharacterName characterName;
+        public Character(CharacterName characterName, Rectangle rectangle, CharacterStatistics characterStats, ClassName className, Team team)
+            : base(Info.Images[characterName][className], rectangle, GamePieceType.Character)
+        {
+            this.characterName = characterName;
+            this.team = team;
             weapon = null;
-            this.characterClass = characterClass;
+            this.className = className;
+            this.characterClass = Info.Classes[className];
             this.characterStats = characterStats;
             currentHealth = TotalStats.HealthPoints;
+            animations = Info.Animations[className][team];
+            currentAnimation = AnimationName.Walking;
         }
 
         public override void Update(GameTime gameTime)
         {
             if (!IsDead)
             {
+                animations[currentAnimation].Update(gameTime);
+                sourceRectangle = animations[currentAnimation].SourceRectangle;
+                origin = animations[currentAnimation].Origin;
                 base.Update(gameTime);
             }
         }

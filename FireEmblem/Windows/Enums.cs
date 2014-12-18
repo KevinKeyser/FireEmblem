@@ -5,6 +5,20 @@ using System.Text;
 
 namespace FireEmblem
 {
+    public enum AnimationType
+    {
+        Normal,
+        Reverse,
+        PingPong,
+        Skip
+    }
+
+    public enum AnimationName
+    {
+        Walking,
+        Attacking
+    }
+
     public enum TurnOrder
     {
         Picking,
@@ -36,7 +50,8 @@ namespace FireEmblem
     public enum ItemType
     {
         Weapon,
-        Usable,
+        StatModifier,
+        Health,
         Ect
     }
 
@@ -47,7 +62,7 @@ namespace FireEmblem
         Flying,
         Monsters,
         Dragons,
-        FellDragon
+        FellDragons
     }
     public enum WeaponSpecial
     {
@@ -80,7 +95,7 @@ namespace FireEmblem
         Tyfing,
         Balmung,
         Mystletainn,
-        DolKatti,
+        SolKatti,
         Ragnell,
         TreeBranch,
         GlassSword,
@@ -91,7 +106,122 @@ namespace FireEmblem
         EliwoodsBlade,
         EirikasBlade,
         SeliphsBlade,
-        AlmsBlade
+        AlmsBlade,
+
+        BronzeLance,
+        IronLance,
+        SteelLance,
+        SilverLance,
+        BraveLance,
+        Javelin,
+        ShortSpear,
+        Spear,
+        BeastKiller,
+        BlessedLance,
+        KillerLance,
+        Luna,
+        Gradivus,
+        GaeBolg,
+        Gungnir,
+        Log,
+        GlassLance,
+        MiniatureLance,
+        Shockstick,
+        SuperiorLance,
+        FinnsLance,
+        EphraimsLance,
+        SigurdsLance,
+
+        BronzeAxe,
+        IronAxe,
+        SteelAxe,
+        SilverAxe,
+        BraveAxe,
+        HandAxe,
+        ShortAxe,
+        Tomahawk,
+        Hammer,
+        BoltAxe,
+        KillerAxe,
+        Vegeance,
+        WolfBerg,
+        Hauteclere,
+        Helswath,
+        Armads,
+        Ladle,
+        GlassAxe,
+        ImposingAxe,
+        VolantAxe,
+        SuperiorAxe,
+        OrsinsHatchet,
+        TitaniasAxe,
+        HectorsAxe,
+
+        BronzeBow,
+        IronBow,
+        SteelBow,
+        SilverBow,
+        BraveBow,
+        BlessedBow,
+        KillerBow,
+        Longbow,
+        Astra,
+        Parthia,
+        Yewfelle,
+        Nidhogg,
+        DoubleBow,
+        SlackBow,
+        GlassBow,
+        ToweringBow,
+        UnderdogBow,
+        SuperiorBow,
+        WoltsBow,
+        InnesBow,
+
+        Fire,
+        Elfire,
+        Arcfire,
+        Bolganone,
+        Valflame,
+        Thunder,
+        Elthunder,
+        Arcthunder,
+        Thoron,
+        Mjolnir,
+        Wind,
+        Elwind,
+        Arcwind,
+        Rexcalibur,
+        Excalibur,
+        Forseti,
+        BookofNaga,
+        Flux,
+        Nosferatu,
+        Ruin,
+        Waste,
+        Goetia,
+        GrimasTruth,
+        Mire,
+        DyingBlaze,
+        MicaiahsPyre,
+        SuperiorJolt,
+        KatarinasBolt,
+        Wilderwind,
+        CelicasGale,
+        AversasNight,
+
+        Heal,
+        Mend,
+        Physic,
+        Recover,
+        Fortify,
+        GoddessStaff,
+        Rescue,
+        Ward,
+        Hammerne,
+        Kneader,
+        BalmwoodStaff,
+        Catharsis
     }
 
     public enum ClassName
@@ -141,5 +271,53 @@ namespace FireEmblem
         DreadFighter,
         Soldier,
         Conqueror,
+    }
+
+    public enum CharacterName
+    {
+        Anna,
+        Aversa,
+        Basilio,
+        Brady,
+        Cherche,
+        Chrom,
+        Cordelia,
+        Donnel,
+        Emmeryn,
+        Excellus,
+        Flavia,
+        Gaius,
+        Gangrel,
+        Gerome,
+        Gregor,
+        Henry,
+        Inigo,
+        Kellam,
+        Kjelle,
+        Laurent,
+        Libra,
+        Lissa,
+        Lucina,
+        Maribelle,
+        Miriel,
+        Nah,
+        Noire,
+        Nowi,
+        Olivia,
+        Owain,
+        Panne,
+        Priam,
+        Ricken,
+        Sayri,
+        Severa,
+        Stahl,
+        Sully,
+        Tharja,
+        Tiki,
+        Vaike,
+        Validar,
+        Virion,
+        Yarne,
+        Yenfay
     }
 }

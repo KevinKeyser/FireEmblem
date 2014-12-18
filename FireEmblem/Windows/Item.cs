@@ -21,6 +21,11 @@ namespace FireEmblem
             PriceValue = priceValue;
         }
 
+        public virtual object Clone()
+        {
+            return new Item(Name, UsesMax, PriceValue, ItemType) { UsesCurrent = this.UsesCurrent };
+        }
+
         public override string ToString()
         {
             return string.Format("{0} {1}/{2}", Name, UsesCurrent, UsesMax);

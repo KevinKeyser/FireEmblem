@@ -35,12 +35,14 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Animation.cs" />
     <Compile Include="BattleMenu.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="CharacterClass.cs" />
     <Compile Include="CharacterStatistics.cs" />
     <Compile Include="EndWindow.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="Frame.cs" />
     <Compile Include="GameApplication.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="GamePiece.cs" />
