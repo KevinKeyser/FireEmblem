@@ -15,7 +15,6 @@ namespace FireEmblem
     }
     public class Character : GamePiece
     {
-
         private Team team;
 
         public Team Team

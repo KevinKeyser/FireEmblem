@@ -11,11 +11,21 @@ namespace FireEmblem
         public WeaponType[] UsableWeapons;
         public CharacterStatistics Stats;
 
-        public CharacterClass(string name, WeaponType[] usableweapons, CharacterStatistics stats)
+        private UnitType[] unitType;
+
+        public UnitType[] UnitType
+        {
+            get { return unitType; }
+            set { unitType = value; }
+        }
+        
+
+        public CharacterClass(string name, WeaponType[] usableweapons, UnitType[] unitType, CharacterStatistics stats)
         {
             Name = name;
             UsableWeapons = usableweapons;
             Stats = stats;
+            this.unitType = unitType;
         }
 
         public override string ToString()
