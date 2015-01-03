@@ -66,9 +66,9 @@ namespace FireEmblem
                 }
             }
             tiles[new Vector2(5)].Piece = new Character(CharacterName.Anna, tiles[new Vector2(5, 5)].Rectangle, new CharacterStatistics(), ClassName.Archer, Team.Red);
-            tiles[new Vector2(5)].Piece.ToCharacter().Items = new Item[] { new HealthItem("Potion", 0, 0, 10, 3, 1000), (Weapon)Info.Weapons[WeaponName.BronzeBow].Clone() };
+            tiles[new Vector2(5)].Piece.ToCharacter().Items = new Item[] { new HealthItem("Potion", 0, 0, 10, 3, 1000), (Weapon)Info.Items[ItemName.BronzeBow].Clone() };
             tiles[new Vector2(3, 5)].Piece = new Character(CharacterName.Brady, tiles[new Vector2(3, 5)].Rectangle, new CharacterStatistics(), ClassName.GriffonRider, Team.Blue);
-            tiles[new Vector2(3, 5)].Piece.ToCharacter().Items = new Item[] { new HealthItem("Potion", 0, 0, 10, 3, 1000), (Weapon)Info.Weapons[WeaponName.BronzeSword].Clone(), (Weapon)Info.Weapons[WeaponName.BronzeAxe].Clone() };
+            tiles[new Vector2(3, 5)].Piece.ToCharacter().Items = new Item[] { new HealthItem("Potion", 0, 0, 10, 3, 1000), (Weapon)Info.Items[ItemName.BronzeSword].Clone(), (Weapon)Info.Items[ItemName.BronzeAxe].Clone() };
             
             battleMenu = new BattleMenu(new Vector2(0, 0), new Vector2(200, 400), Content.Load<SpriteFont>("Font"), pixel);
             itemMenu = new ItemMenu(Vector2.Zero, new Vector2(200, 400), Content.Load<SpriteFont>("Font"), pixel);
